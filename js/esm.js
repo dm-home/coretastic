@@ -51,3 +51,33 @@ window.esmCorrectionFixed = esmCorrectionFixed;
 window.exponentialSocProfile = exponentialSocProfile;
 window.linearBdProfile = linearBdProfile;
 window.esmCorrectionProfile = esmCorrectionProfile;
+
+function esmDeltas(rows, k = 1.9) {
+  const groups = {};
+  rows.forEach(r => {
+    if (!r.Time) return;
+    const t = r.Time.trim();
+    const inc = parseFloat(r.Interval_cm);
+    const bd = parseFloat(r.BD_g_cm3);
+    const soc = parseFloat(r.SOC_percent) / 100;
+    if (!groups[t]) {
+      groups[t] = { bd: [], soc: [], inc, depth: 0 };
+    }
+    groups[t].bd.push(bd);
+    groups[t].soc.push(soc);
+    groups[t].depth += inc;
+  });
+
+  const times = Object.keys(groups).sort();
+  if (times.length === 0) return [];
+  const base = groups[times[0]];
+  const baseStock = esmCorrectionProfile(base.bd, base.soc, base.bd, base.soc, base.depth, base.inc, k);
+
+  return times.map(t => {
+    const g = groups[t];
+    const corr = esmCorrectionProfile(base.bd, base.soc, g.bd, g.soc, base.depth, base.inc, k);
+    return { time: t, corrected: corr, delta: corr - baseStock };
+  });
+}
+
+window.esmDeltas = esmDeltas;
