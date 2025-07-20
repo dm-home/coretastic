@@ -19,3 +19,7 @@ python app.py
 | bd_i | soc_i | bd_n | soc_n | depth |
 |------|-------|------|-------|-------|
 | 1.5  | 0.014 | 1.1  | 0.016 | 30    |
+
+On first launch the app loads `data/default.xlsx`, which contains the worked
+example from the Nature 2023 paper. The file is parsed automatically and the
+corrected SOC stock is shown using the fixed-depth method.

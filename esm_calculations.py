@@ -1,7 +1,29 @@
 import numpy as np
 
 def compute_mineral_mass(bd, depth, soc, k=1.9):
-    MT = bd * depth * 1e4 * 1e-6
+    """Compute mineral mass in Mg/ha.
+
+    Parameters
+    ----------
+    bd : float
+        Bulk density in g/cm^3.
+    depth : float
+        Sample depth in cm.
+    soc : float
+        Soil organic carbon fraction (0-1).
+    k : float, optional
+        van Bemmelen factor.
+
+    Returns
+    -------
+    float
+        Mineral mass (Mg/ha).
+    """
+
+    # Convert bulk density and depth to Mg/ha of soil mass. 1 g/cm^3 is
+    # equivalent to 1 Mg/m^3. A hectare is 10,000 m^2, so the mass of a soil
+    # layer is ``bd * depth/100 * 10_000``.
+    MT = bd * depth * 100
     return MT * (1 - k * soc)
 
 def esm_correction_fixed(bd_i, soc_i, bd_n, soc_n, depth=30, k=1.9):
