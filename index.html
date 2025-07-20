@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ESM Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script src="js/esm.js"></script>
+  <style>
+    table, th, td { border: 1px solid #ccc; border-collapse: collapse; }
+    th, td { padding: 4px 8px; }
+  </style>
+</head>
+<body>
+  <h1>ESM Calculator</h1>
+  <p><em>On first visit, we’ve pre-loaded the Nature2023 dataset so you can see how it works.</em></p>
+  <form id="form">
+    <input type="file" id="csvfile" accept=".csv">
+    <label><input type="radio" name="method" value="fixed" checked> Fixed-depth method</label>
+    <label><input type="radio" name="method" value="profile"> Profile-based method</label>
+    <button type="submit">Compute</button>
+  </form>
+  <table id="results">
+    <thead>
+      <tr>
+        <th>bd_i</th><th>soc_i</th><th>bd_n</th><th>soc_n</th>
+        <th>depth</th><th>adjusted_depth</th><th>corrected_stock</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tableBody = document.querySelector('#results tbody');
+    function compute(rows, method) {
+      tableBody.innerHTML = '';
+      rows.forEach(r => {
+        if (!r.bd_i) return;
+        const bd_i = parseFloat(r.bd_i);
+        const soc_i = parseFloat(r.soc_i);
+        const bd_n = parseFloat(r.bd_n);
+        const soc_n = parseFloat(r.soc_n);
+        const depth = parseFloat(r.depth || 30);
+        let Da = '';
+        let corr = 0;
+        if (method === 'fixed') {
+          const res = esmCorrectionFixed(bd_i, soc_i, bd_n, soc_n, depth);
+          Da = res.Da.toFixed(6);
+          corr = res.corrected.toFixed(6);
+        } else {
+          const inc = 1;
+          const bd_i_p = linearBdProfile(bd_i, bd_i, depth, inc);
+          const soc_i_p = exponentialSocProfile(soc_i, soc_i, depth, 0, inc);
+          const bd_n_p = linearBdProfile(bd_n, bd_n, depth, inc);
+          const soc_n_p = exponentialSocProfile(soc_n, soc_n, depth, 0, inc);
+          corr = esmCorrectionProfile(bd_i_p, soc_i_p, bd_n_p, soc_n_p, depth, inc).toFixed(6);
+        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${bd_i}</td><td>${soc_i}</td><td>${bd_n}</td><td>${soc_n}</td><td>${depth}</td><td>${Da}</td><td>${corr}</td>`;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    fetch('data/default_clean.csv')
+      .then(resp => resp.text())
+      .then(text => {
+        Papa.parse(text, {header:true, skipEmptyLines:true, complete: res => compute(res.data, 'fixed')});
+      });
+
+    document.getElementById('form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const method = document.querySelector('input[name="method"]:checked').value;
+      const file = document.getElementById('csvfile').files[0];
+      if (!file) return;
+      Papa.parse(file, {
+        header:true,
+        skipEmptyLines:true,
+        complete: res => compute(res.data, method)
+      });
+    });
+  });
+  </script>
+</body>
+</html>
