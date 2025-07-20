@@ -2,7 +2,7 @@
 
 This Flask-based web application lets users upload a CSV of initial and new bulk density (bd) and SOC values to compute corrected SOC stock via two methods:
 
-- **Fixed-depth**: single-depth mineral mass correction  
+- **Fixed-depth**: single-depth mineral mass correction
 - **Profile-based**: full depth-profile correction
 
 ## Setup
