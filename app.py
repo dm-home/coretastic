@@ -37,18 +37,25 @@ def index():
                             'corrected_stock': corr})
         return render_template('results.html', results=results, method=method)
 
-    df = pd.read_excel(DATA_PATH)
+    df = pd.read_excel(DATA_PATH, header=5).iloc[1:].reset_index(drop=True)
     results = []
-    for _, row in df.iterrows():
-        bd_i, soc_i, bd_n, soc_n = row[['bd_i','soc_i','bd_n','soc_n']]
-        depth = row.get('depth', 30)
+    for i in range(0, len(df)-1, 2):
+        base = df.iloc[i]
+        new = df.iloc[i+1]
+        depth = float(base['Depth _cm'])
+        bd_i = float(base['BD _g/cm3'])
+        soc_i = float(base['SOC_%']) / 100
+        bd_n = float(new['BD _g/cm3'])
+        soc_n = float(new['SOC_%']) / 100
         Da, orig, corr = esm_correction_fixed(bd_i, soc_i, bd_n, soc_n, depth)
         results.append({
-            'bd_i': bd_i, 'soc_i': soc_i,
-            'bd_n': bd_n, 'soc_n': soc_n,
+            'bd_i': bd_i,
+            'soc_i': soc_i,
+            'bd_n': bd_n,
+            'soc_n': soc_n,
             'depth': depth,
             'adjusted_depth': Da,
-            'corrected_stock': corr
+            'corrected_stock': corr * 1e4
         })
     return render_template('results.html', results=results, method='fixed (default)')
 
