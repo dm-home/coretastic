@@ -1,25 +1,11 @@
-# Equivalent Soil Mass (ESM) Web App
+# Equivalent Soil Mass (ESM) Calculator
 
-This Flask-based web application lets users upload a CSV of initial and new bulk density (bd) and SOC values to compute corrected SOC stock via two methods:
+This repository now contains a static implementation of the Equivalent Soil Mass calculator. All calculations are performed in the browser using JavaScript so the site can be hosted on GitHub Pages.
 
-- **Fixed-depth**: single-depth mineral mass correction
-- **Profile-based**: full depth-profile correction
-
-## Setup
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python app.py
-```
-
-## CSV Format
+Upload a CSV containing the columns below or experiment with the included `data/default_clean.csv` dataset.
 
 | bd_i | soc_i | bd_n | soc_n | depth |
 |------|-------|------|-------|-------|
 | 1.5  | 0.014 | 1.1  | 0.016 | 30    |
 
-On first launch the app loads `data/default.xlsx`, which contains the worked
-example from the Nature 2023 paper. The file is parsed automatically and the
-corrected SOC stock is shown using the fixed-depth method.
+Open `index.html` in a browser (or deploy the repository via GitHub Pages) to use the calculator. Both the fixed depth and profile based methods are implemented.
