@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head><title>Results</title></head>
+<body>
+  <h1>Results ({{ method }})</h1>
+  <table border="1">
+    <tr><th>bd_i</th><th>soc_i</th><th>bd_n</th><th>soc_n</th><th>depth</th><th>adjusted_depth</th><th>corrected_stock</th></tr>
+    {% for r in results %}
+    <tr>
+      <td>{{ r.bd_i }}</td><td>{{ r.soc_i }}</td><td>{{ r.bd_n }}</td><td>{{ r.soc_n }}</td>
+      <td>{{ r.depth }}</td><td>{{ r.adjusted_depth }}</td><td>{{ r.corrected_stock }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p><a href="/">Back</a></p>
+</body>
+</html>
